@@ -1,27 +1,48 @@
-# SPLENT Marketplace Web MVP
+# Marketplace Web MVP
 
-This is an independent frontend MVP for a Marketplace-like experience.
+Mini proyecto frontend para ver paquetes de SPLENT y sus dependencias.
 
-## Features
+## Que hace
 
-- List available packages.
-- Inspect dependency and reverse-dependency relations for each package.
-- Copy a ready-to-use install command:
+- Muestra una lista de paquetes.
+- Puedes buscar por nombre, descripcion o tags.
+- Al seleccionar uno, ves:
+	- version
+	- descripcion
+	- dependencias
+	- paquetes que lo usan
+	- relaciones tipo `A -> B`
+- Tiene boton para copiar el comando de instalacion.
 
-`splent install <package_name>`
+## Como ejecutarlo
 
-## Run locally
-
-From this folder:
+Desde esta carpeta:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then open:
+Luego abre en el navegador:
 
-`http://localhost:8080`
+```text
+http://localhost:8080
+```
 
-## Data source
+## Como se usa
 
-Package data is loaded from `data/packages.json`.
+1. En la columna izquierda tienes los paquetes.
+2. Usa el buscador para filtrar.
+3. Haz clic en un paquete para ver el detalle.
+4. Si quieres, pulsa `Copiar` para llevarte el comando.
+
+Ejemplo de comando:
+
+```bash
+splent install splent_feature_public
+```
+
+## Datos
+
+Los datos salen del archivo:
+
+`data/packages.json`
