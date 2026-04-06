@@ -1,0 +1,53 @@
+{
+  "packages": [
+    {
+      "name": "splent_feature_auth",
+      "version": "1.0.0",
+      "description": "Authentication and user session management.",
+      "dependencies": ["splent_feature_public"],
+      "tags": ["security", "login", "core"]
+    },
+    {
+      "name": "splent_feature_public",
+      "version": "1.0.0",
+      "description": "Public pages, shared templates and base navigation.",
+      "dependencies": [],
+      "tags": ["ui", "core"]
+    },
+    {
+      "name": "splent_feature_profile",
+      "version": "1.0.0",
+      "description": "User profile data and editing screens.",
+      "dependencies": ["splent_feature_auth"],
+      "tags": ["user", "dashboard"]
+    },
+    {
+      "name": "splent_feature_mail",
+      "version": "1.0.0",
+      "description": "Transactional email sending infrastructure.",
+      "dependencies": ["splent_feature_public"],
+      "tags": ["notifications", "infra"]
+    },
+    {
+      "name": "splent_feature_confirmemail",
+      "version": "1.0.0",
+      "description": "Email verification flow for newly registered users.",
+      "dependencies": ["splent_feature_auth", "splent_feature_mail"],
+      "tags": ["security", "onboarding"]
+    },
+    {
+      "name": "splent_feature_reset",
+      "version": "1.0.0",
+      "description": "Password reset via tokenized email links.",
+      "dependencies": ["splent_feature_auth", "splent_feature_mail"],
+      "tags": ["security", "account"]
+    },
+    {
+      "name": "splent_feature_redis",
+      "version": "1.0.0",
+      "description": "Redis integration for caching and state services.",
+      "dependencies": [],
+      "tags": ["infra", "performance"]
+    }
+  ]
+}
