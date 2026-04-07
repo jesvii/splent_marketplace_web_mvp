@@ -2,52 +2,178 @@
   "packages": [
     {
       "name": "splent_feature_auth",
+      "package_name": "splent-feature-auth",
       "version": "1.0.0",
-      "description": "Authentication and user session management.",
-      "dependencies": ["splent_feature_public"],
-      "tags": ["security", "login", "core"]
+      "tags": ["security", "login", "core"],
+      "contract": {
+        "description": "Authentication feature",
+        "provides": {
+          "routes": ["/login", "/logout", "/signup/"],
+          "blueprints": ["auth_bp"],
+          "models": ["User"],
+          "commands": [],
+          "hooks": ["layout.anonymous_sidebar"],
+          "services": ["AuthenticationService"],
+          "signals": ["user-registered"],
+          "translations": ["es"],
+          "docker": []
+        },
+        "requires": {
+          "features": ["splent_feature_public"],
+          "env_vars": ["SECRET_KEY"],
+          "signals": []
+        }
+      }
     },
     {
       "name": "splent_feature_public",
+      "package_name": "splent-feature-public",
       "version": "1.0.0",
-      "description": "Public pages, shared templates and base navigation.",
-      "dependencies": [],
-      "tags": ["ui", "core"]
+      "tags": ["ui", "core"],
+      "contract": {
+        "description": "Public pages, shared templates and base navigation.",
+        "provides": {
+          "routes": ["/", "/about", "/contact"],
+          "blueprints": ["public_bp"],
+          "models": [],
+          "commands": [],
+          "hooks": ["layout.public_nav"],
+          "services": ["PublicPageService"],
+          "signals": [],
+          "translations": ["es", "en"],
+          "docker": []
+        },
+        "requires": {
+          "features": [],
+          "env_vars": [],
+          "signals": []
+        }
+      }
     },
     {
       "name": "splent_feature_profile",
+      "package_name": "splent-feature-profile",
       "version": "1.0.0",
-      "description": "User profile data and editing screens.",
-      "dependencies": ["splent_feature_auth"],
-      "tags": ["user", "dashboard"]
+      "tags": ["user", "dashboard"],
+      "contract": {
+        "description": "User profile data and editing screens.",
+        "provides": {
+          "routes": ["/profile", "/profile/edit"],
+          "blueprints": ["profile_bp"],
+          "models": ["Profile"],
+          "commands": [],
+          "hooks": ["layout.user_sidebar"],
+          "services": ["ProfileService"],
+          "signals": ["profile-updated"],
+          "translations": ["es"],
+          "docker": []
+        },
+        "requires": {
+          "features": ["splent_feature_auth"],
+          "env_vars": [],
+          "signals": ["user-registered"]
+        }
+      }
     },
     {
       "name": "splent_feature_mail",
+      "package_name": "splent-feature-mail",
       "version": "1.0.0",
-      "description": "Transactional email sending infrastructure.",
-      "dependencies": ["splent_feature_public"],
-      "tags": ["notifications", "infra"]
+      "tags": ["notifications", "infra"],
+      "contract": {
+        "description": "Transactional email sending infrastructure.",
+        "provides": {
+          "routes": [],
+          "blueprints": [],
+          "models": [],
+          "commands": ["mail:drain-queue"],
+          "hooks": [],
+          "services": ["MailService"],
+          "signals": ["email-sent"],
+          "translations": [],
+          "docker": ["mailhog"]
+        },
+        "requires": {
+          "features": ["splent_feature_public"],
+          "env_vars": ["SMTP_HOST", "SMTP_PORT"],
+          "signals": []
+        }
+      }
     },
     {
       "name": "splent_feature_confirmemail",
+      "package_name": "splent-feature-confirmemail",
       "version": "1.0.0",
-      "description": "Email verification flow for newly registered users.",
-      "dependencies": ["splent_feature_auth", "splent_feature_mail"],
-      "tags": ["security", "onboarding"]
+      "tags": ["security", "onboarding"],
+      "contract": {
+        "description": "Email verification flow for newly registered users.",
+        "provides": {
+          "routes": ["/confirm-email", "/confirm-email/<token>"],
+          "blueprints": ["confirm_email_bp"],
+          "models": ["EmailConfirmationToken"],
+          "commands": [],
+          "hooks": ["layout.anonymous_sidebar"],
+          "services": ["EmailConfirmationService"],
+          "signals": ["email-confirmed"],
+          "translations": ["es"],
+          "docker": []
+        },
+        "requires": {
+          "features": ["splent_feature_auth", "splent_feature_mail"],
+          "env_vars": ["FRONTEND_BASE_URL"],
+          "signals": ["user-registered"]
+        }
+      }
     },
     {
       "name": "splent_feature_reset",
+      "package_name": "splent-feature-reset",
       "version": "1.0.0",
-      "description": "Password reset via tokenized email links.",
-      "dependencies": ["splent_feature_auth", "splent_feature_mail"],
-      "tags": ["security", "account"]
+      "tags": ["security", "account"],
+      "contract": {
+        "description": "Password reset via tokenized email links.",
+        "provides": {
+          "routes": ["/forgot-password", "/reset-password/<token>"],
+          "blueprints": ["reset_bp"],
+          "models": ["PasswordResetToken"],
+          "commands": [],
+          "hooks": [],
+          "services": ["PasswordResetService"],
+          "signals": ["password-reset-requested"],
+          "translations": ["es"],
+          "docker": []
+        },
+        "requires": {
+          "features": ["splent_feature_auth", "splent_feature_mail"],
+          "env_vars": ["FRONTEND_BASE_URL"],
+          "signals": []
+        }
+      }
     },
     {
       "name": "splent_feature_redis",
+      "package_name": "splent-feature-redis",
       "version": "1.0.0",
-      "description": "Redis integration for caching and state services.",
-      "dependencies": [],
-      "tags": ["infra", "performance"]
+      "tags": ["infra", "performance"],
+      "contract": {
+        "description": "Redis integration for caching and state services.",
+        "provides": {
+          "routes": [],
+          "blueprints": [],
+          "models": [],
+          "commands": ["redis:flush"],
+          "hooks": [],
+          "services": ["RedisCacheService"],
+          "signals": [],
+          "translations": [],
+          "docker": ["redis"]
+        },
+        "requires": {
+          "features": [],
+          "env_vars": ["REDIS_URL"],
+          "signals": []
+        }
+      }
     }
   ]
 }
