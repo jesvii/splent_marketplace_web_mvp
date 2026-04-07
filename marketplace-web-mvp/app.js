@@ -23,9 +23,17 @@ function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function getDescription(pkg) {
+  return pkg.contract?.description || pkg.description || "";
+}
+
+function getDependencies(pkg) {
+  return pkg.contract?.requires?.features || pkg.dependencies || [];
+}
+
 function getReverseDependencies(targetName) {
   return state.packages
-    .filter((pkg) => pkg.dependencies.includes(targetName))
+    .filter((pkg) => getDependencies(pkg).includes(targetName))
     .map((pkg) => pkg.name);
 }
 
@@ -49,11 +57,14 @@ function renderSimpleList(container, values, emptyText = "(none)") {
 function packageMatchesQuery(pkg, query) {
   if (!query) return true;
 
-  return (
-    normalize(pkg.name).includes(query) ||
-    normalize(pkg.description).includes(query) ||
-    pkg.tags.some((tag) => normalize(tag).includes(query))
-  );
+  const values = [
+    pkg.name,
+    pkg.package_name,
+    getDescription(pkg),
+    ...(pkg.tags || []),
+  ];
+
+  return values.some((value) => normalize(value).includes(query));
 }
 
 function renderPackageList(query = "") {
@@ -72,7 +83,7 @@ function renderPackageList(query = "") {
 
     btn.innerHTML = `
       <span class="name">${pkg.name}</span>
-      <span class="meta">v${pkg.version} · ${pkg.dependencies.length} dependencias</span>
+      <span class="meta">v${pkg.version} · ${getDependencies(pkg).length} dependencias</span>
     `;
     btn.addEventListener("click", () => selectPackage(pkg.name));
 
@@ -118,12 +129,12 @@ function selectPackage(name) {
 
   dom.detailName.textContent = pkg.name;
   dom.detailVersion.textContent = `v${pkg.version}`;
-  dom.detailDescription.textContent = pkg.description;
+  dom.detailDescription.textContent = getDescription(pkg);
 
   const cmd = `splent install ${pkg.name}`;
   dom.installCommand.textContent = cmd;
 
-  const deps = [...pkg.dependencies];
+  const deps = [...getDependencies(pkg)];
   const reverseDeps = getReverseDependencies(pkg.name);
 
   renderSimpleList(dom.dependenciesList, deps);
@@ -136,7 +147,7 @@ function selectPackage(name) {
 async function init() {
   const response = await fetch("./data/packages.json");
   const data = await response.json();
-  state.packages = data.packages;
+  state.packages = data.packages || [];
 
   renderPackageList();
 

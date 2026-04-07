@@ -2,7 +2,6 @@
   "packages": [
     {
       "name": "splent_feature_auth",
-      "package_name": "splent-feature-auth",
       "version": "1.0.0",
       "tags": ["security", "login", "core"],
       "contract": {
@@ -27,7 +26,6 @@
     },
     {
       "name": "splent_feature_public",
-      "package_name": "splent-feature-public",
       "version": "1.0.0",
       "tags": ["ui", "core"],
       "contract": {
@@ -52,7 +50,6 @@
     },
     {
       "name": "splent_feature_profile",
-      "package_name": "splent-feature-profile",
       "version": "1.0.0",
       "tags": ["user", "dashboard"],
       "contract": {
@@ -77,7 +74,6 @@
     },
     {
       "name": "splent_feature_mail",
-      "package_name": "splent-feature-mail",
       "version": "1.0.0",
       "tags": ["notifications", "infra"],
       "contract": {
@@ -102,7 +98,6 @@
     },
     {
       "name": "splent_feature_confirmemail",
-      "package_name": "splent-feature-confirmemail",
       "version": "1.0.0",
       "tags": ["security", "onboarding"],
       "contract": {
@@ -127,7 +122,6 @@
     },
     {
       "name": "splent_feature_reset",
-      "package_name": "splent-feature-reset",
       "version": "1.0.0",
       "tags": ["security", "account"],
       "contract": {
@@ -152,7 +146,6 @@
     },
     {
       "name": "splent_feature_redis",
-      "package_name": "splent-feature-redis",
       "version": "1.0.0",
       "tags": ["infra", "performance"],
       "contract": {
