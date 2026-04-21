@@ -47,9 +47,9 @@ function renderSimpleList(container, values, emptyText = "(none)") {
     return;
   }
 
-  values.forEach((v) => {
+  values.forEach((value) => {
     const li = document.createElement("li");
-    li.textContent = v;
+    li.textContent = value;
     container.appendChild(li);
   });
 }
@@ -57,12 +57,7 @@ function renderSimpleList(container, values, emptyText = "(none)") {
 function packageMatchesQuery(pkg, query) {
   if (!query) return true;
 
-  const values = [
-    pkg.name,
-    pkg.package_name,
-    getDescription(pkg),
-    ...(pkg.tags || []),
-  ];
+  const values = [pkg.name, pkg.package_name, getDescription(pkg), ...(pkg.tags || [])];
 
   return values.some((value) => normalize(value).includes(query));
 }
@@ -112,13 +107,12 @@ async function copyCommand(command) {
       dom.copyBtn.classList.remove("copied");
     }, 1200);
   } catch (_) {
-    // Fallback for restricted contexts.
     window.prompt("Copia el comando:", command);
   }
 }
 
 function selectPackage(name) {
-  const pkg = state.packages.find((p) => p.name === name);
+  const pkg = state.packages.find((item) => item.name === name);
   if (!pkg) return;
 
   state.selected = pkg;
@@ -131,8 +125,8 @@ function selectPackage(name) {
   dom.detailVersion.textContent = `v${pkg.version}`;
   dom.detailDescription.textContent = getDescription(pkg);
 
-  const cmd = `splent install ${pkg.name}`;
-  dom.installCommand.textContent = cmd;
+  const command = `splent install ${pkg.name}`;
+  dom.installCommand.textContent = command;
 
   const deps = [...getDependencies(pkg)];
   const reverseDeps = getReverseDependencies(pkg.name);
@@ -141,11 +135,15 @@ function selectPackage(name) {
   renderSimpleList(dom.reverseDependenciesList, reverseDeps);
   renderEdges(pkg.name, deps, reverseDeps);
 
-  dom.copyBtn.onclick = () => copyCommand(cmd);
+  dom.copyBtn.onclick = () => copyCommand(command);
 }
 
 async function init() {
-  const response = await fetch("./data/packages.json");
+  const response = await fetch("/api/packages");
+  if (!response.ok) {
+    throw new Error(`No se pudieron cargar los paquetes (${response.status})`);
+  }
+
   const data = await response.json();
   state.packages = data.packages || [];
 
@@ -155,8 +153,8 @@ async function init() {
     selectPackage(state.packages[0].name);
   }
 
-  dom.searchInput.addEventListener("input", (ev) => {
-    renderPackageList(ev.target.value);
+  dom.searchInput.addEventListener("input", (event) => {
+    renderPackageList(event.target.value);
   });
 }
 

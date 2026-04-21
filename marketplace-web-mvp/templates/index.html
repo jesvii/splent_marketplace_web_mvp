@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
     <div class="bg-shape bg-a" aria-hidden="true"></div>
@@ -20,7 +20,7 @@
       <p class="eyebrow">Independent App MVP</p>
       <h1>SPLENT Marketplace</h1>
       <p class="subtitle">
-        Explora paquetes, revisa dependencias y copia el comando de instalación en un clic.
+        Explora paquetes, revisa dependencias y copia el comando de instalacion en un clic.
       </p>
     </header>
 
@@ -42,7 +42,7 @@
       <section class="panel detail-panel" aria-label="Detalle de paquete">
         <div id="emptyState" class="empty-state">
           <h3>Selecciona un paquete</h3>
-          <p>Al hacer clic verás descripción, dependencias y comando de instalación.</p>
+          <p>Al hacer clic veras descripcion, dependencias y comando de instalacion.</p>
         </div>
 
         <article id="packageDetail" class="detail hidden">
@@ -77,6 +77,6 @@
       </section>
     </main>
 
-    <script src="./app.js" defer></script>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
   </body>
 </html>

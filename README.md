@@ -1,48 +1,43 @@
 # Marketplace Web MVP
 
-A small frontend project to browse SPLENT packages and their dependencies.
+Aplicacion web pequena para explorar paquetes de SPLENT y sus dependencias, ahora servida con Flask.
 
-## What It Does
+## Que Hace
 
-- Shows a list of packages.
-- You can search by name, description, or tags.
-- When you select one, you can see:
-	- version
-	- description
-	- dependencies
-	- packages that use it
-	- relation lines like `A -> B`
-- Includes a button to copy the install command.
+- Muestra un listado de paquetes.
+- Permite buscar por nombre, descripcion o tags.
+- Al seleccionar un paquete, muestra:
+  - version
+  - descripcion
+  - dependencias
+  - paquetes que lo usan
+  - relaciones tipo `A -> B`
+- Incluye un boton para copiar el comando de instalacion.
+- Expone una API JSON en `/api/packages`.
 
-## How To Run It
+## Como Arrancarlo
 
-From this folder:
+Instala dependencias:
 
 ```bash
-python3 -m http.server 8080
+python3 -m pip install -r requirements.txt
 ```
 
-Then open in your browser:
+Lanza el servidor:
+
+```bash
+python3 app.py
+```
+
+Abre despues:
 
 ```text
 http://localhost:8080
 ```
 
-## How To Use It
+## Estructura
 
-1. In the left column, you have the package list.
-2. Use the search box to filter.
-3. Click a package to see its details.
-4. If you want, click `Copy` to copy the command.
-
-Command example:
-
-```bash
-splent install splent_feature_public
-```
-
-## Data
-
-Data is loaded from:
-
-`data/packages.json`
+- `app.py`: entrada Flask
+- `marketplace-web-mvp/templates/index.html`: plantilla principal
+- `marketplace-web-mvp/static/`: frontend estatico
+- `marketplace-web-mvp/data/packages.json`: datos de paquetes
