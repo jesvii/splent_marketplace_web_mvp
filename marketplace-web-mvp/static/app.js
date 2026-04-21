@@ -12,6 +12,8 @@ const dom = {
   detailName: document.getElementById("detailName"),
   detailVersion: document.getElementById("detailVersion"),
   detailDescription: document.getElementById("detailDescription"),
+  detailRepoLink: document.getElementById("detailRepoLink"),
+  detailUpdatedAt: document.getElementById("detailUpdatedAt"),
   installCommand: document.getElementById("installCommand"),
   copyBtn: document.getElementById("copyBtn"),
   dependenciesList: document.getElementById("dependenciesList"),
@@ -24,11 +26,28 @@ function normalize(value) {
 }
 
 function getDescription(pkg) {
-  return pkg.contract?.description || pkg.description || "";
+  return pkg.contract?.description || pkg.description || "No description available yet.";
 }
 
 function getDependencies(pkg) {
   return pkg.contract?.requires?.features || pkg.dependencies || [];
+}
+
+function getVersionLabel(pkg) {
+  return pkg.version ? `v${pkg.version}` : "from contract";
+}
+
+function formatUpdatedAt(value) {
+  if (!value) return "Unknown";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
 }
 
 function getReverseDependencies(targetName) {
@@ -66,7 +85,7 @@ function renderPackageList(query = "") {
   const normalizedQuery = normalize(query);
   const filtered = state.packages.filter((pkg) => packageMatchesQuery(pkg, normalizedQuery));
 
-  dom.packageCount.textContent = String(filtered.length);
+  dom.packageCount.textContent = `${filtered.length} packages`;
   dom.packageList.innerHTML = "";
 
   filtered.forEach((pkg) => {
@@ -78,7 +97,7 @@ function renderPackageList(query = "") {
 
     btn.innerHTML = `
       <span class="name">${pkg.name}</span>
-      <span class="meta">v${pkg.version} · ${getDependencies(pkg).length} dependencias</span>
+      <span class="meta">${getVersionLabel(pkg)} · ${getDependencies(pkg).length} dependencies</span>
     `;
     btn.addEventListener("click", () => selectPackage(pkg.name));
 
@@ -99,15 +118,15 @@ function renderEdges(pkgName, deps, reverseDeps) {
 async function copyCommand(command) {
   try {
     await navigator.clipboard.writeText(command);
-    dom.copyBtn.textContent = "Copiado";
+    dom.copyBtn.textContent = "Copied";
     dom.copyBtn.classList.add("copied");
 
     setTimeout(() => {
-      dom.copyBtn.textContent = "Copiar";
+      dom.copyBtn.textContent = "Copy";
       dom.copyBtn.classList.remove("copied");
     }, 1200);
   } catch (_) {
-    window.prompt("Copia el comando:", command);
+    window.prompt("Copy the command:", command);
   }
 }
 
@@ -122,8 +141,11 @@ function selectPackage(name) {
   dom.detail.classList.remove("hidden");
 
   dom.detailName.textContent = pkg.name;
-  dom.detailVersion.textContent = `v${pkg.version}`;
+  dom.detailVersion.textContent = getVersionLabel(pkg);
   dom.detailDescription.textContent = getDescription(pkg);
+  dom.detailRepoLink.href = pkg.html_url || "#";
+  dom.detailRepoLink.textContent = pkg.full_name || pkg.name;
+  dom.detailUpdatedAt.textContent = formatUpdatedAt(pkg.updated_at);
 
   const command = `splent install ${pkg.name}`;
   dom.installCommand.textContent = command;
@@ -141,7 +163,7 @@ function selectPackage(name) {
 async function init() {
   const response = await fetch("/api/packages");
   if (!response.ok) {
-    throw new Error(`No se pudieron cargar los paquetes (${response.status})`);
+    throw new Error(`Could not load packages (${response.status})`);
   }
 
   const data = await response.json();
@@ -160,5 +182,5 @@ async function init() {
 
 init().catch((error) => {
   dom.emptyState.classList.remove("hidden");
-  dom.emptyState.innerHTML = `<h3>Error cargando datos</h3><p>${error.message}</p>`;
+  dom.emptyState.innerHTML = `<h3>Could not load registry</h3><p>${error.message}</p>`;
 });

@@ -13,69 +13,89 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
-    <div class="bg-shape bg-a" aria-hidden="true"></div>
-    <div class="bg-shape bg-b" aria-hidden="true"></div>
-
-    <header class="hero">
-      <p class="eyebrow">Independent App MVP</p>
-      <h1>SPLENT Marketplace</h1>
-      <p class="subtitle">
-        Explora paquetes, revisa dependencias y copia el comando de instalacion en un clic.
-      </p>
-    </header>
-
-    <main class="layout" role="main">
-      <section class="panel list-panel" aria-label="Paquetes disponibles">
-        <div class="panel-head">
-          <h2>Paquetes</h2>
-          <span id="packageCount" class="pill">0</span>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-topline">
+          <p class="eyebrow">SPLENT Marketplace</p>
+          <span class="status-dot">reading from splent-api</span>
         </div>
+        <h1>Package explorer</h1>
+        <p class="subtitle">
+          Small internal view to inspect package contracts, check dependencies, and copy the install
+          command quickly.
+        </p>
+      </header>
 
-        <label class="search-wrap" for="searchInput">
-          <span>Buscar</span>
-          <input id="searchInput" type="search" placeholder="auth, redis, profile..." />
-        </label>
-
-        <ul id="packageList" class="package-list"></ul>
-      </section>
-
-      <section class="panel detail-panel" aria-label="Detalle de paquete">
-        <div id="emptyState" class="empty-state">
-          <h3>Selecciona un paquete</h3>
-          <p>Al hacer clic veras descripcion, dependencias y comando de instalacion.</p>
-        </div>
-
-        <article id="packageDetail" class="detail hidden">
-          <div class="detail-head">
-            <h2 id="detailName"></h2>
-            <span id="detailVersion" class="pill"></span>
+      <main class="layout" role="main">
+        <section class="panel list-panel" aria-label="Available packages">
+          <div class="panel-head">
+            <div>
+              <p class="section-label">Package list</p>
+              <h2>Available packages</h2>
+            </div>
+            <span id="packageCount" class="pill">0 packages</span>
           </div>
 
-          <p id="detailDescription" class="description"></p>
+          <label class="search-wrap" for="searchInput">
+            <span>Filter by name or description</span>
+            <input id="searchInput" type="search" placeholder="auth, mail, profile..." />
+          </label>
 
-          <div class="command-box">
-            <span>Comando</span>
-            <code id="installCommand"></code>
-            <button id="copyBtn" type="button">Copiar</button>
+          <ul id="packageList" class="package-list"></ul>
+        </section>
+
+        <section class="panel detail-panel" aria-label="Package detail">
+          <div id="emptyState" class="empty-state">
+            <h3>No package selected</h3>
+            <p>Choose one from the left column to inspect its contract and dependency graph.</p>
           </div>
 
-          <section class="deps-block">
-            <h3>Dependencias</h3>
-            <ul id="dependenciesList" class="tag-list"></ul>
-          </section>
+          <article id="packageDetail" class="detail hidden">
+            <div class="detail-head">
+              <div>
+                <p class="section-label">Selected package</p>
+                <h2 id="detailName"></h2>
+              </div>
+              <span id="detailVersion" class="pill"></span>
+            </div>
 
-          <section class="deps-block">
-            <h3>Usado por</h3>
-            <ul id="reverseDependenciesList" class="tag-list"></ul>
-          </section>
+            <p id="detailDescription" class="description"></p>
 
-          <section class="deps-block">
-            <h3>Relaciones</h3>
-            <ul id="edgesList" class="edges-list"></ul>
-          </section>
-        </article>
-      </section>
-    </main>
+            <div class="meta-grid">
+              <div class="meta-card">
+                <span class="meta-label">Repository</span>
+                <a id="detailRepoLink" href="#" target="_blank" rel="noreferrer">Open on GitHub</a>
+              </div>
+              <div class="meta-card">
+                <span class="meta-label">Last update</span>
+                <strong id="detailUpdatedAt">Unknown</strong>
+              </div>
+            </div>
+
+            <div class="command-box">
+              <span>Install command</span>
+              <code id="installCommand"></code>
+              <button id="copyBtn" type="button">Copy</button>
+            </div>
+
+            <section class="deps-block">
+              <h3>Requires</h3>
+              <ul id="dependenciesList" class="tag-list"></ul>
+            </section>
+
+            <section class="deps-block">
+              <h3>Used by</h3>
+              <ul id="reverseDependenciesList" class="tag-list"></ul>
+            </section>
+
+            <section class="deps-block">
+              <h3>Dependency edges</h3>
+              <ul id="edgesList" class="edges-list"></ul>
+            </section>
+          </article>
+        </section>
+      </main>
+    </div>
 
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
   </body>
