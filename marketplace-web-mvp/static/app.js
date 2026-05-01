@@ -34,8 +34,8 @@ function getDependencies(pkg) {
 }
 
 function getVersionLabel(pkg) {
-  if (pkg.feature_ref?.includes("@")) {
-    return pkg.feature_ref.split("@").pop();
+  if (pkg.full_name?.includes("@")) {
+    return pkg.full_name.split("@").pop();
   }
 
   return pkg.metadata?.feature_version || pkg.metadata?.version || "from contract";
@@ -43,7 +43,7 @@ function getVersionLabel(pkg) {
 
 function getPackageId(pkg) {
   if (!pkg) return "";
-  return pkg.feature_ref || pkg.repository || pkg.name;
+  return pkg.full_name || pkg.repository || pkg.name;
 }
 
 function getUpdatedAt(pkg) {
@@ -90,7 +90,7 @@ function packageMatchesQuery(pkg, query) {
   if (!query) return true;
 
   const values = [
-    pkg.feature_ref,
+    pkg.full_name,
     pkg.repository,
     pkg.name,
     getDescription(pkg),
