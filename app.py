@@ -17,13 +17,13 @@ def get_splent_api_base_url() -> str:
     return os.getenv("SPLENT_API_BASE_URL", DEFAULT_SPLENT_API_BASE_URL).rstrip("/")
 
 
-def fetch_packages() -> tuple[dict, int]:
+def fetch_packages() -> tuple[list | dict, int]:
     api_url = f"{get_splent_api_base_url()}/api/packages"
 
     try:
         with urlopen(api_url) as response:
             payload = response.read().decode("utf-8")
-            return {"packages": jsonify_response_to_python(payload)}, response.status
+            return jsonify_response_to_python(payload), response.status
     except HTTPError as error:
         return {
             "error": "Splent API returned an error",
@@ -38,7 +38,7 @@ def fetch_packages() -> tuple[dict, int]:
         }, 502
 
 
-def jsonify_response_to_python(payload: str) -> list:
+def jsonify_response_to_python(payload: str) -> list | dict:
     import json
 
     data = json.loads(payload)

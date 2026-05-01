@@ -26,15 +26,28 @@ function normalize(value) {
 }
 
 function getDescription(pkg) {
-  return pkg.contract?.description || pkg.description || "No description available yet.";
+  return pkg.contract?.description || "No description available yet.";
 }
 
 function getDependencies(pkg) {
-  return pkg.contract?.requires?.features || pkg.dependencies || [];
+  return pkg.contract?.requires?.features || [];
 }
 
 function getVersionLabel(pkg) {
-  return pkg.version ? `v${pkg.version}` : "from contract";
+  if (pkg.feature_ref?.includes("@")) {
+    return pkg.feature_ref.split("@").pop();
+  }
+
+  return pkg.metadata?.feature_version || pkg.metadata?.version || "from contract";
+}
+
+function getPackageId(pkg) {
+  if (!pkg) return "";
+  return pkg.feature_ref || pkg.repository || pkg.name;
+}
+
+function getUpdatedAt(pkg) {
+  return pkg.metadata?.updated_at || pkg.updated_at;
 }
 
 function formatUpdatedAt(value) {
@@ -53,7 +66,7 @@ function formatUpdatedAt(value) {
 function getReverseDependencies(targetName) {
   return state.packages
     .filter((pkg) => getDependencies(pkg).includes(targetName))
-    .map((pkg) => pkg.name);
+    .map((pkg) => getPackageId(pkg));
 }
 
 function renderSimpleList(container, values, emptyText = "(none)") {
@@ -76,7 +89,12 @@ function renderSimpleList(container, values, emptyText = "(none)") {
 function packageMatchesQuery(pkg, query) {
   if (!query) return true;
 
-  const values = [pkg.name, pkg.package_name, getDescription(pkg), ...(pkg.tags || [])];
+  const values = [
+    pkg.feature_ref,
+    pkg.repository,
+    pkg.name,
+    getDescription(pkg),
+  ];
 
   return values.some((value) => normalize(value).includes(query));
 }
@@ -93,13 +111,13 @@ function renderPackageList(query = "") {
     li.className = "package-item";
 
     const btn = document.createElement("button");
-    if (state.selected?.name === pkg.name) btn.classList.add("active");
+    if (getPackageId(state.selected) === getPackageId(pkg)) btn.classList.add("active");
 
     btn.innerHTML = `
       <span class="name">${pkg.name}</span>
       <span class="meta">${getVersionLabel(pkg)} · ${getDependencies(pkg).length} dependencies</span>
     `;
-    btn.addEventListener("click", () => selectPackage(pkg.name));
+    btn.addEventListener("click", () => selectPackage(getPackageId(pkg)));
 
     li.appendChild(btn);
     dom.packageList.appendChild(li);
@@ -130,8 +148,8 @@ async function copyCommand(command) {
   }
 }
 
-function selectPackage(name) {
-  const pkg = state.packages.find((item) => item.name === name);
+function selectPackage(featureRef) {
+  const pkg = state.packages.find((item) => getPackageId(item) === featureRef);
   if (!pkg) return;
 
   state.selected = pkg;
@@ -143,19 +161,19 @@ function selectPackage(name) {
   dom.detailName.textContent = pkg.name;
   dom.detailVersion.textContent = getVersionLabel(pkg);
   dom.detailDescription.textContent = getDescription(pkg);
-  dom.detailRepoLink.href = pkg.html_url || "#";
-  dom.detailRepoLink.textContent = pkg.full_name || pkg.name;
-  dom.detailUpdatedAt.textContent = formatUpdatedAt(pkg.updated_at);
+  dom.detailRepoLink.href = pkg.repo_url || "#";
+  dom.detailRepoLink.textContent = pkg.repository || pkg.name;
+  dom.detailUpdatedAt.textContent = formatUpdatedAt(getUpdatedAt(pkg));
 
-  const command = `splent install ${pkg.name}`;
+  const command = `splent install ${getPackageId(pkg)}`;
   dom.installCommand.textContent = command;
 
   const deps = [...getDependencies(pkg)];
-  const reverseDeps = getReverseDependencies(pkg.name);
+  const reverseDeps = getReverseDependencies(getPackageId(pkg));
 
   renderSimpleList(dom.dependenciesList, deps);
   renderSimpleList(dom.reverseDependenciesList, reverseDeps);
-  renderEdges(pkg.name, deps, reverseDeps);
+  renderEdges(getPackageId(pkg), deps, reverseDeps);
 
   dom.copyBtn.onclick = () => copyCommand(command);
 }
@@ -167,12 +185,12 @@ async function init() {
   }
 
   const data = await response.json();
-  state.packages = data.packages || [];
+  state.packages = Array.isArray(data) ? data : data.packages || [];
 
   renderPackageList();
 
   if (state.packages.length) {
-    selectPackage(state.packages[0].name);
+    selectPackage(getPackageId(state.packages[0]));
   }
 
   dom.searchInput.addEventListener("input", (event) => {
