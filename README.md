@@ -33,7 +33,8 @@ python3 app.py
 If your API is not running on the default URL, set:
 
 ```bash
-export SPLENT_API_BASE_URL=http://127.0.0.1:5000
+export SPLENT_API_URL=http://127.0.0.1:5000
+export SPLENT_API_TOKEN=your-token
 ```
 
 Then open:
@@ -47,4 +48,5 @@ http://localhost:8080
 - `app.py`: Flask entry point
 - `marketplace-web-mvp/templates/index.html`: main template
 - `marketplace-web-mvp/static/`: static frontend assets
-- `SPLENT_API_BASE_URL`: base URL for `splent-api`
+- `SPLENT_API_URL`: base URL for `splent-api`
+- `SPLENT_API_TOKEN`: bearer token sent to `splent-api`
