@@ -1,0 +1,9 @@
+services:
+  marketplace:
+    build: .
+    container_name: splent-marketplace
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "80:80"

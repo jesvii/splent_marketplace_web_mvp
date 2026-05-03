@@ -1,22 +1,41 @@
-# Marketplace Web MVP
+# SPLENT Marketplace Web MVP
 
-A small web app to explore SPLENT packages and their dependencies, now served with Flask and connected to `splent-api`.
+A small Flask web app to browse SPLENT packages from `splent-api`.
 
-## What It Does
+The marketplace does not store packages. It serves the web UI and proxies `GET /api/packages` to the configured SPLENT API using a bearer token.
 
-- Shows a list of packages.
-- Lets you search by name, description, or tags.
-- When you select a package, it shows:
-  - version
-  - description
-  - dependencies
-  - packages that depend on it
-  - relationship lines like `A -> B`
-- Includes a button to copy the install command.
-- Exposes a JSON API at `/api/packages`.
-- Fetches package data from the external SPLENT API instead of reading a local JSON file.
+## Features
 
-## How To Run It
+- Lists SPLENT packages/features.
+- Searches by `full_name`, `repository`, `name`, or contract description.
+- Shows package details, dependencies, reverse dependencies, and dependency edges.
+- Opens the GitHub repository using `repo_url`.
+- Copies the install command using `full_name`.
+
+## Configuration
+
+Create a `.env` file from the example:
+
+```bash
+cp .env.example .env
+```
+
+Set the API URL and token:
+
+```env
+SPLENT_API_URL=https://api.splent.io
+SPLENT_API_TOKEN=replace-with-the-marketplace-api-token
+```
+
+`SPLENT_API_TOKEN` is sent to the API as:
+
+```http
+Authorization: Bearer <token>
+```
+
+Do not commit `.env`. Only `.env.example` should be versioned.
+
+## Local Development
 
 Install dependencies:
 
@@ -24,29 +43,75 @@ Install dependencies:
 python3 -m pip install -r requirements.txt
 ```
 
-Start the server:
+Start the development server:
 
 ```bash
 python3 app.py
 ```
 
-If your API is not running on the default URL, set:
-
-```bash
-export SPLENT_API_URL=http://127.0.0.1:5000
-export SPLENT_API_TOKEN=your-token
-```
-
-Then open:
+Open:
 
 ```text
 http://localhost:8080
 ```
 
-## Structure
+## Docker Deployment
 
-- `app.py`: Flask entry point
-- `marketplace-web-mvp/templates/index.html`: main template
-- `marketplace-web-mvp/static/`: static frontend assets
-- `SPLENT_API_URL`: base URL for `splent-api`
-- `SPLENT_API_TOKEN`: bearer token sent to `splent-api`
+The production deployment must run with Docker Compose. The service listens on container port `80`, maps host port `80`, and uses `restart: always`.
+
+On the marketplace VM:
+
+```bash
+git clone <this-repository-url>
+cd splent_marketplace_web_mvp
+cp .env.example .env
+```
+
+Edit `.env` with the real API URL and bearer token:
+
+```bash
+nano .env
+```
+
+Build and start the service:
+
+```bash
+docker compose up -d --build
+```
+
+Check the container:
+
+```bash
+docker compose ps
+docker compose logs -f marketplace
+```
+
+Check the app health endpoint:
+
+```bash
+curl http://localhost/health
+```
+
+The public domain should point to the VM and resolve to:
+
+```text
+http://marketplace.splent.io
+```
+
+## Updating The Deployment
+
+On the VM:
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+## Project Structure
+
+- `app.py`: Flask entry point and API proxy.
+- `marketplace-web-mvp/templates/index.html`: main HTML template.
+- `marketplace-web-mvp/static/`: frontend assets.
+- `Dockerfile`: production image.
+- `docker-compose.yml`: production Compose service.
+- `.env.example`: environment variable template.
