@@ -55,6 +55,21 @@ Open:
 http://localhost:8080
 ```
 
+## Unit Tests
+
+The unit tests are located in `tests/unit` and use `pytest`.
+
+- `tests/unit/test_app.py` tests the Flask app, API proxy, token header, and upstream error handling.
+- `tests/unit/conftest.py` defines reusable pytest fixtures for the Flask app and test client.
+
+Run the tests with:
+
+```bash
+python3 -m pytest tests/unit
+```
+
+The tests use fake package data and mocks. They do not call the real Splent API.
+
 ## Docker Deployment
 
 The production deployment must run with Docker Compose. The service listens on container port `80`, maps host port `80`, and uses `restart: always`.
