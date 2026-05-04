@@ -165,7 +165,7 @@ function selectPackage(featureRef) {
   dom.detailRepoLink.textContent = pkg.repository || pkg.name;
   dom.detailUpdatedAt.textContent = formatUpdatedAt(getUpdatedAt(pkg));
 
-  const command = `splent install ${getPackageId(pkg)}`;
+  const command = `splent feature:install ${getPackageId(pkg)}`;
   dom.installCommand.textContent = command;
 
   const deps = [...getDependencies(pkg)];
