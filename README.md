@@ -25,6 +25,7 @@ Set the API URL and token:
 ```env
 SPLENT_API_URL=https://api.splent.io
 SPLENT_API_TOKEN=replace-with-the-marketplace-api-token
+MARKETPLACE_API_TOKEN=replace-with-the-cli-login-token
 ```
 
 `SPLENT_API_TOKEN` is sent to the API as:
@@ -35,6 +36,7 @@ Authorization: Bearer <token>
 
 The CLI stores SPLENT_API_URL and SPLENT_API_TOKEN for the Splent API.
 The marketplace web UI only displays packages by proxying the API.
+`MARKETPLACE_API_TOKEN` is used by the marketplace endpoints to validate CLI login and authenticated search. If it is not set, the app falls back to `SPLENT_API_TOKEN`.
 
 Do not commit `.env`. Only `.env.example` should be versioned.
 
