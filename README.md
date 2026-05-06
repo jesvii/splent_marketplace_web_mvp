@@ -33,7 +33,33 @@ SPLENT_API_TOKEN=replace-with-the-marketplace-api-token
 Authorization: Bearer <token>
 ```
 
+The CLI stores SPLENT_API_URL and SPLENT_API_TOKEN for the Splent API.
+The marketplace web UI only displays packages by proxying the API.
+
 Do not commit `.env`. Only `.env.example` should be versioned.
+
+## CLI Marketplace Endpoints
+
+The marketplace exposes small JSON endpoints for the SPLENT CLI:
+
+- `GET /api/packages`: returns packages for `splent feature:search`.
+- `POST /api/marketplace/login`: validates a token if the CLI wants to check login against the server.
+- `POST /api/marketplace/logout`: returns `ok`; the CLI removes the stored local session.
+- `GET /api/search?q=<query>`: optional server-side package search endpoint.
+
+Login accepts either a JSON body:
+
+```json
+{"token":"<marketplace-token>"}
+```
+
+or an `Authorization` header:
+
+```http
+Authorization: Bearer <marketplace-token>
+```
+
+`/api/search` requires the same Bearer token and matches `full_name`, `repository`, `name`, or contract description.
 
 ## Local Development
 
@@ -59,7 +85,7 @@ http://localhost:8080
 
 The unit tests are located in `tests/unit` and use `pytest`.
 
-- `tests/unit/test_app.py` tests the Flask app, API proxy, token header, and upstream error handling.
+- `tests/unit/test_app.py` tests the Flask app, API proxy, token header, CLI login/search endpoints, and upstream error handling.
 - `tests/unit/conftest.py` defines reusable pytest fixtures for the Flask app and test client.
 
 Run the tests with:

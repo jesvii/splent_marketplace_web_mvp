@@ -77,3 +77,70 @@ def test_fetch_packages_returns_502_when_api_is_down(monkeypatch):
 
     assert status == 502
     assert payload["error"] == "Could not connect to Splent API"
+
+
+def test_marketplace_login_with_valid_token(client, monkeypatch):
+    monkeypatch.setenv("SPLENT_API_TOKEN", "marketplace-token")
+
+    res = client.post(
+        "/api/marketplace/login",
+        json={"token": "marketplace-token"},
+    )
+
+    assert res.status_code == 200
+    assert res.get_json()["status"] == "ok"
+
+
+def test_marketplace_login_rejects_invalid_token(client, monkeypatch):
+    monkeypatch.setenv("SPLENT_API_TOKEN", "marketplace-token")
+
+    res = client.post(
+        "/api/marketplace/login",
+        json={"token": "wrong-token"},
+    )
+
+    assert res.status_code == 401
+    assert res.get_json()["error"] == "Unauthorized"
+
+
+def test_marketplace_logout_ok(client):
+    res = client.post("/api/marketplace/logout")
+
+    assert res.status_code == 200
+    assert res.get_json() == {"status": "ok"}
+
+
+def test_search_needs_valid_token(client, monkeypatch):
+    monkeypatch.setenv("SPLENT_API_TOKEN", "marketplace-token")
+
+    res = client.get("/api/search?q=auth")
+
+    assert res.status_code == 401
+    assert res.get_json()["error"] == "Unauthorized"
+
+
+def test_search_filters_marketplace_packages(client, monkeypatch):
+    packages = [
+        {
+            "full_name": "splent/splent_feature_auth",
+            "name": "splent_feature_auth",
+            "repository": "splent/splent_feature_auth",
+            "contract": {"description": "Authentication feature"},
+        },
+        {
+            "full_name": "splent/splent_feature_mail",
+            "name": "splent_feature_mail",
+            "repository": "splent/splent_feature_mail",
+            "contract": {"description": "Email feature"},
+        },
+    ]
+    monkeypatch.setenv("SPLENT_API_TOKEN", "marketplace-token")
+    monkeypatch.setattr(marketplace_app, "fetch_packages", lambda: (packages, 200))
+
+    res = client.get(
+        "/api/search?q=auth",
+        headers={"Authorization": "Bearer marketplace-token"},
+    )
+
+    assert res.status_code == 200
+    assert res.get_json() == [packages[0]]
