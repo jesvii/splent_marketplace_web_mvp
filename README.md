@@ -24,7 +24,7 @@ Set the API URL and token:
 
 ```env
 SPLENT_API_URL=https://api.splent.io
-SPLENT_API_TOKEN=replace-with-the-marketplace-api-token
+SPLENT_API_TOKEN=replace-with-the-splent-api-token
 MARKETPLACE_API_TOKEN=replace-with-the-cli-login-token
 ```
 
