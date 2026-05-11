@@ -91,19 +91,6 @@ def test_marketplace_login_with_valid_token(client, monkeypatch):
     assert res.get_json()["status"] == "ok"
 
 
-def test_marketplace_login_uses_marketplace_api_token(client, monkeypatch):
-    monkeypatch.setenv("SPLENT_API_TOKEN", "splent-token")
-    monkeypatch.setenv("MARKETPLACE_API_TOKEN", "marketplace-token")
-
-    res = client.post(
-        "/api/marketplace/login",
-        json={"token": "marketplace-token"},
-    )
-
-    assert res.status_code == 200
-    assert res.get_json()["status"] == "ok"
-
-
 def test_marketplace_login_rejects_invalid_token(client, monkeypatch):
     monkeypatch.setenv("SPLENT_API_TOKEN", "marketplace-token")
 

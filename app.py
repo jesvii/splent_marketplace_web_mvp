@@ -38,10 +38,6 @@ def get_splent_api_token() -> str:
     return os.getenv("SPLENT_API_TOKEN", "")
 
 
-def get_marketplace_api_token() -> str:
-    return os.getenv("MARKETPLACE_API_TOKEN") or get_splent_api_token()
-
-
 def get_splent_api_headers() -> dict[str, str]:
     headers = {"Accept": "application/json"}
     token = get_splent_api_token()
@@ -61,7 +57,7 @@ def get_bearer_token() -> str:
 
 
 def token_is_valid(token: str) -> bool:
-    expected_token = get_marketplace_api_token()
+    expected_token = get_splent_api_token()
     return bool(expected_token) and token == expected_token
 
 
@@ -171,7 +167,6 @@ def create_app() -> Flask:
             "status": "ok",
             "splent_api_url": get_splent_api_base_url(),
             "splent_api_token_configured": bool(get_splent_api_token()),
-            "marketplace_api_token_configured": bool(get_marketplace_api_token()),
         }
 
     return app
