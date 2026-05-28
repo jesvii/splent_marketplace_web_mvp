@@ -56,6 +56,10 @@ jobs:
         run: |
           coverage run --source=app -m pytest tests/unit
           coverage xml
+          if [ -z "$CODACY_PROJECT_TOKEN" ]; then
+            echo "CODACY_PROJECT_TOKEN secret is not configured; skipping Codacy coverage upload."
+            exit 0
+          fi
           python-codacy-coverage -r coverage.xml
         env:
           FLASK_ENV: testing
@@ -75,4 +79,3 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.sarif
-
