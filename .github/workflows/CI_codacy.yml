@@ -60,6 +60,9 @@ jobs:
         env:
           FLASK_ENV: testing
 
+      - name: Clean coverage artifacts
+        run: rm -f .coverage coverage.xml
+
       - name: Run Codacy Analysis CLI
         if: github.event_name == 'push' && env.CODACY_PROJECT_TOKEN != ''
         uses: codacy/codacy-analysis-cli-action@master
