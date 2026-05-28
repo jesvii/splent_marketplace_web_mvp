@@ -11,18 +11,11 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
   build:
     name: Backend quality checks
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        python-version:
-          - "3.11"
-          - "3.12"
 
     steps:
       - name: Checkout code
@@ -31,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
           cache: pip
 
       - name: Install dependencies
@@ -46,36 +39,30 @@ jobs:
       - name: Security audit with pip-audit
         run: pip-audit || true
 
-      - name: Run tests
-        run: python -m pytest tests/unit
+      - name: Run tests with coverage
+        run: |
+          coverage run --source=app -m pytest tests/unit
+          coverage xml
         env:
           FLASK_ENV: testing
 
       - name: Upload coverage to Codacy
-        if: github.event_name == 'push' && matrix.python-version == '3.12'
+        if: github.event_name == 'push'
         run: |
-          coverage run --source=app -m pytest tests/unit
-          coverage xml
           if [ -z "$CODACY_PROJECT_TOKEN" ]; then
             echo "CODACY_PROJECT_TOKEN secret is not configured; skipping Codacy coverage upload."
             exit 0
           fi
+
           python-codacy-coverage -r coverage.xml
         env:
-          FLASK_ENV: testing
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
       - name: Run Codacy Analysis CLI
-        if: github.event_name == 'push' && matrix.python-version == '3.12'
+        if: github.event_name == 'push'
         uses: codacy/codacy-analysis-cli-action@master
         with:
-          output: results.sarif
-          format: sarif
-          gh-code-scanning-compat: true
-          max-allowed-issues: 2147483647
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          upload: true
+          max-allowed-issues: 0
 
-      - name: Upload SARIF results
-        if: github.event_name == 'push' && matrix.python-version == '3.12'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: results.sarif
