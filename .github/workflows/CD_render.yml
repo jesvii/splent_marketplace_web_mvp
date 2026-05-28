@@ -1,38 +1,46 @@
-name: CD Render
+name: Deploy to Render
 
 on:
-  workflow_run:
-    workflows:
-      - CI pytest
+  push:
     branches:
       - main
-      - master
-    types:
-      - completed
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: render-deploy-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   deploy:
-    name: Deploy marketplace web
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Trigger Render deploy hook
-        env:
-          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
         run: |
-          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
-            echo "Missing RENDER_DEPLOY_HOOK_URL secret."
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest tests/unit
+        env:
+          FLASK_ENV: testing
+
+      - name: Deploy
+        env:
+          DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "Missing RENDER_DEPLOY_HOOK_URL secret"
             exit 1
           fi
 
-          curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
+          curl --fail --show-error --silent "$DEPLOY_URL"
 
