@@ -26,6 +26,15 @@ def test_health_ok(client):
     assert res.get_json()["status"] == "ok"
 
 
+def test_index_renders_marketplace_page(client):
+    res = client.get("/")
+
+    assert res.status_code == 200
+    assert b"SPLENT Marketplace MVP" in res.data
+    assert b"/static/styles.css" in res.data
+    assert b"/static/app.js" in res.data
+
+
 def test_json_payload_accepts_list_or_packages_object():
     packages = [{"name": "splent_feature_auth"}]
 

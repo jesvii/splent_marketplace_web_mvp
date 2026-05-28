@@ -1,0 +1,38 @@
+name: CD Render
+
+on:
+  workflow_run:
+    workflows:
+      - CI pytest
+    branches:
+      - main
+      - master
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy marketplace web
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Missing RENDER_DEPLOY_HOOK_URL secret."
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
+

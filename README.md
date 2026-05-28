@@ -96,6 +96,23 @@ python3 -m pytest tests/unit
 
 The tests use fake package data and mocks. They do not call the real Splent API.
 
+## GitHub Actions
+
+This repository includes three workflows:
+
+- `CI_pytest.yml`: runs the Flask route, page render, and mocked API proxy tests with `pytest`.
+- `CI_codacy.yml`: runs Codacy code quality analysis for the web codebase.
+- `CD_render.yml`: triggers a Render deployment after `CI pytest` passes on `main` or `master`.
+
+Configure these repository secrets in GitHub:
+
+```text
+CODACY_PROJECT_TOKEN
+RENDER_DEPLOY_HOOK_URL
+```
+
+`CODACY_PROJECT_TOKEN` comes from the Codacy project settings. `RENDER_DEPLOY_HOOK_URL` comes from the Render service deploy hook.
+
 ## Docker Deployment
 
 The production deployment must run with Docker Compose. The service listens on container port `80`, maps host port `80`, and uses `restart: always`.
