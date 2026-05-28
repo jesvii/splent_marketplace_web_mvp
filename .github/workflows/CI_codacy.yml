@@ -17,7 +17,7 @@ jobs:
     name: Backend quality checks
     runs-on: ubuntu-latest
     env:
-      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -52,7 +52,7 @@ jobs:
         if: github.event_name == 'push'
         run: |
           if [ -z "$CODACY_PROJECT_TOKEN" ]; then
-            echo "CODACY_PROJECT_TOKEN secret is not configured; skipping Codacy coverage upload."
+            echo "CODACY_TOKEN secret is not configured; skipping Codacy coverage upload."
             exit 0
           fi
 
@@ -70,4 +70,4 @@ jobs:
 
       - name: Skip Codacy Analysis CLI
         if: github.event_name == 'push' && env.CODACY_PROJECT_TOKEN == ''
-        run: echo "CODACY_PROJECT_TOKEN secret is not configured; skipping Codacy analysis upload."
+        run: echo "CODACY_TOKEN secret is not configured; skipping Codacy analysis upload."
