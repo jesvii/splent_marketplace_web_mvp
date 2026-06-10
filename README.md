@@ -96,6 +96,17 @@ python3 -m pytest tests/unit
 
 The tests use fake package data and mocks. They do not call the real Splent API.
 
+### End-to-end test
+
+An additional E2E test checks the CLI -> API -> marketplace flow using a
+temporary registry and Flask test clients. Run it from a workspace where
+`splent-api`, `splent_cli`, and `splent_marketplace_web_mvp` are sibling
+directories:
+
+```bash
+python3 -m pytest tests/e2e/test_cli_api_marketplace_flow.py
+```
+
 ## GitHub Actions
 
 This repository includes three workflows:
